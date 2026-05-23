@@ -78,20 +78,20 @@ ENTER ZONE_2:
 
 ---
 
-# Example Input
+# Exact Input For This Lab
 
 ```text
-ENTER VPC_NAME: taw-custom-network
+ENTER VPC_NAME: vpc-network-22zs
 
-ENTER SUBNET_A: subnet-a
-ENTER SUBNET_B: subnet-b
+ENTER SUBNET_A: subnet-a-6wks
+ENTER SUBNET_B: subnet-b-hzgn
 
-ENTER FIREWALL_1: allow-ssh
-ENTER FIREWALL_2: allow-rdp
-ENTER FIREWALL_3: allow-icmp
+ENTER FIREWALL_1: gars-firewall-ssh
+ENTER FIREWALL_2: pilm-firewall-rdp
+ENTER FIREWALL_3: necx-firewall-icmp
 
-ENTER ZONE_1: us-central1-a
-ENTER ZONE_2: europe-west1-b
+ENTER ZONE_1: us-east4-b
+ENTER ZONE_2: europe-west4-a
 ```
 
 ---
@@ -102,6 +102,7 @@ ENTER ZONE_2: europe-west1-b
 
 | Resource | Details |
 |---|---|
+| VPC Name | vpc-network-22zs |
 | Routing Mode | Regional |
 | Stack Type | IPv4 Only |
 
@@ -109,58 +110,119 @@ ENTER ZONE_2: europe-west1-b
 
 ## Subnetworks
 
-| Subnet | CIDR |
-|---|---|
-| SUBNET_A | 10.10.10.0/24 |
-| SUBNET_B | 10.10.20.0/24 |
+| Subnet | Region | CIDR |
+|---|---|---|
+| subnet-a-6wks | us-east4 | 10.10.10.0/24 |
+| subnet-b-hzgn | europe-west4 | 10.10.20.0/24 |
 
 ---
 
 ## Firewall Rules
 
-| Firewall | Purpose |
+| Firewall Rule | Purpose |
 |---|---|
-| FIREWALL_1 | Allow SSH |
-| FIREWALL_2 | Allow RDP |
-| FIREWALL_3 | Allow ICMP |
+| gars-firewall-ssh | Allow SSH |
+| pilm-firewall-rdp | Allow RDP |
+| necx-firewall-icmp | Allow ICMP |
 
 ---
 
 ## VM Instances
 
-| VM | Purpose |
-|---|---|
-| us-test-01 | Connectivity Testing |
-| us-test-02 | Connectivity Testing |
+| VM | Zone | Machine Type |
+|---|---|---|
+| us-test-01 | us-east4-b | e2-standard-2 |
+| us-test-02 | europe-west4-a | e2-standard-2 |
 
 ---
 
-# Manual Testing Commands
+# After Script Completes
 
-## SSH into us-test-01
+The script automatically creates:
 
-Use the Compute Engine SSH button.
+- VPC network
+- Subnetworks
+- Firewall rules
+- VM instances
 
 ---
 
-# Ping Internal IP
+# Manual Testing Steps
+
+## Open SSH
+
+Go to:
+
+```text
+Compute Engine → VM Instances
+```
+
+Click:
+
+```text
+SSH
+```
+
+for:
+
+```text
+us-test-01
+```
+
+---
+
+# Test 1 — Ping Internal IP
+
+Inside `us-test-01` SSH terminal:
 
 ```bash
 ping -c 3 INTERNAL_IP
 ```
 
----
-
-# Internal DNS Ping
-
-```bash
-ping -c 3 us-test-02.ZONE
-```
-
 Example:
 
 ```bash
-ping -c 3 us-test-02.europe-west1-b
+ping -c 3 10.10.20.2
+```
+
+---
+
+# How to Find Internal IP
+
+Go to:
+
+```text
+Compute Engine → VM Instances
+```
+
+Copy the:
+
+```text
+Internal IP
+```
+
+of:
+
+```text
+us-test-02
+```
+
+---
+
+# Test 2 — Internal DNS Ping
+
+Inside `us-test-01` SSH terminal:
+
+```bash
+ping -c 3 us-test-02.europe-west4-a
+```
+
+---
+
+# Expected Output
+
+```text
+64 bytes from 10.10.20.x: icmp_seq=1 ttl=64 time=xxx ms
 ```
 
 ---
@@ -174,7 +236,17 @@ hostName.[ZONE].c.[PROJECT_ID].internal
 Example:
 
 ```text
-us-test-02.europe-west1-b.c.my-project.internal
+us-test-02.europe-west4-a.c.my-project.internal
+```
+
+---
+
+# Final Verification
+
+After successful ping tests:
+
+```text
+Click "Check my progress"
 ```
 
 ---
@@ -183,19 +255,19 @@ us-test-02.europe-west1-b.c.my-project.internal
 
 - Use temporary Skills Boost credentials only
 - Cloud Shell is pre-authenticated
-- Firewall rules are required for connectivity
+- IPv4 single-stack networking is used
 - Regional dynamic routing is enabled
-- IPv4 only networking is used
+- Firewall rules are required for VM communication
 
 ---
 
 # Expected Outcome
 
-After completing the lab, you should be able to:
+After completing this challenge lab, you should be able to:
 
 - Create a custom VPC
 - Configure subnetworks
 - Configure firewall rules
 - Launch VM instances
-- Test VM-to-VM communication
-- Verify internal DNS connectivity
+- Verify internal VM connectivity
+- Test internal DNS resolution
