@@ -38,12 +38,27 @@ chmod +x Networking101.sh
 
 ---
 
-# Example Input
+# Example Input { According to your question asks in your Labs question }
 
 ```text
 Enter REGION_1: us-central1
 Enter REGION_2: europe-west1
 Enter REGION_3: asia-east1
+```
+
+# Error came up then solutions { Subnet errors }
+
+{ Creates a new subnet }
+```text
+gcloud compute networks subnets create subnet-us-east4 \
+    --network=taw-custom-network \
+    --region=us-east4 \
+    --range=10.3.0.0/16
+```
+
+{ Delete the error existing subnet }
+```text
+gcloud compute networks subnets delete subnet-asia --region=europe-west1
 ```
 
 ---
