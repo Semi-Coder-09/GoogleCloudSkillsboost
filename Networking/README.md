@@ -17,7 +17,7 @@ Open Cloud Shell and run:
 ## Step 1 — Download Script
 
 ```bash
-curl -LO https://github.com/Semi-Coder-09/GoogleCloudSkillsboost/blob/main/Networking101.sh
+curl -LO https://raw.githubusercontent.com/Semi-Coder-09/GoogleCloudSkillsboost/refs/heads/main/Networking/Networking101.sh
 ```
 
 ## Step 2 — Make Script Executable
