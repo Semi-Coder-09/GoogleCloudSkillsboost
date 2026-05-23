@@ -4,10 +4,20 @@ echo "========================================="
 echo "Google Cloud Networking Lab Automation"
 echo "========================================="
 
-# Regions
-export REGION_1=us-central1
-export REGION_2=europe-west1
-export REGION_3=asia-east1
+# Ask user for regions
+read -p "Enter REGION_1: " REGION_1
+read -p "Enter REGION_2: " REGION_2
+read -p "Enter REGION_3: " REGION_3
+
+echo "Using regions:"
+echo "$REGION_1"
+echo "$REGION_2"
+echo "$REGION_3"
+
+# # Regions written as fixed variables
+# export REGION_1=us-central1
+# export REGION_2=europe-west1
+# export REGION_3=asia-east1
 
 # Show active project
 PROJECT_ID=$(gcloud config get-value project)
