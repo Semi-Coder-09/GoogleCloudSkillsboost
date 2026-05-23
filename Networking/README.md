@@ -23,6 +23,10 @@ curl -LO https://raw.githubusercontent.com/Semi-Coder-09/GoogleCloudSkillsboost/
 ## Step 2 — Make Script Executable
 
 ```bash
+sed -i 's/\r$//' Networking101.sh
+```
+
+```bash
 chmod +x Networking101.sh
 ```
 
