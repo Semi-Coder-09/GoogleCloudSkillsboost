@@ -15,7 +15,7 @@ This script automates:
 Open Cloud Shell and run:
 
 ```bash
-curl -LO https://raw.githubusercontent.com/YOUR_USERNAME/GoogleCloudSkillsboost/main/Networking101.sh
+curl -LO https://github.com/Semi-Coder-09/GoogleCloudSkillsboost/blob/main/Networking101.sh
 
 chmod +x Networking101.sh
 
