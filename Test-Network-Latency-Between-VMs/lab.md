@@ -41,7 +41,7 @@ git clone https://github.com/Semi-Coder-09/GoogleCloudSkillsboost.git
 ## Step 2 — Navigate to Folder
 
 ```bash
-cd "GoogleCloudSkillsboost/Test Network Latency Between VMs"
+cd "GoogleCloudSkillsboost/Test-Network-Latency-Between-VMs"
 ```
 
 ---

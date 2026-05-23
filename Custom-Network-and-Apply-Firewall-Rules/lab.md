@@ -39,7 +39,7 @@ git clone https://github.com/Semi-Coder-09/GoogleCloudSkillsboost.git
 ## Step 2 — Navigate to Folder
 
 ```bash
-cd "GoogleCloudSkillsboost/Custom Network and Apply Firewall Rules"
+cd "GoogleCloudSkillsboost/Custom-Network-and-Apply-Firewall-Rules"
 ```
 
 ---
