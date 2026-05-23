@@ -65,13 +65,13 @@ chmod +x TestNetworkLatencyVMs.sh
 # Example Input
 
 ```text
-Enter REGION_1: us-central1
-Enter REGION_2: europe-west1
-Enter REGION_3: asia-east1
+Enter REGION_1: us-east1
+Enter REGION_2: us-east4
+Enter REGION_3: europe-west1
 
-Enter ZONE_1: us-central1-a
-Enter ZONE_2: europe-west1-b
-Enter ZONE_3: asia-east1-a
+Enter ZONE_1: us-east1-c
+Enter ZONE_2: us-east4-c
+Enter ZONE_3: europe-west1-b
 ```
 
 ---
@@ -82,16 +82,16 @@ Enter ZONE_3: asia-east1-a
 
 | VM | Purpose |
 |---|---|
-| us-test-01 | Testing VM |
-| us-test-02 | Testing VM |
-| us-test-03 | Testing VM |
-| us-test-04 | Performance Testing VM |
+| us-test-01 | Main Testing VM |
+| us-test-02 | Cross-Region Testing VM |
+| us-test-03 | Europe Testing VM |
+| us-test-04 | Same-Region Performance Testing VM |
 
 ---
 
 # Manual Testing Commands
 
-## Ping Test
+## Ping External IP
 
 SSH into us-test-01:
 
@@ -99,17 +99,11 @@ SSH into us-test-01:
 ping -c 3 EXTERNAL_IP
 ```
 
-Example:
-
-```bash
-ping -c 3 34.120.10.20
-```
-
 ---
 
-# Install Tools
+# Install Networking Tools
 
-Run on VMs:
+Run on us-test-02 and us-test-04:
 
 ```bash
 sudo apt-get update
@@ -119,7 +113,7 @@ sudo apt-get -y install traceroute mtr tcpdump iperf whois host dnsutils siege
 
 ---
 
-# Traceroute
+# Traceroute Test
 
 ```bash
 traceroute www.icann.org
@@ -130,63 +124,55 @@ traceroute www.icann.org
 # Internal VM Ping
 
 ```bash
-ping -c 3 us-test-02.ZONE
-```
-
-Example:
-
-```bash
-ping -c 3 us-test-02.europe-west1-b
+ping -c 3 us-test-02.us-east4-c
 ```
 
 ---
 
-# iperf Server
+# TCP iperf Test
 
-Run on us-test-01:
+## On us-test-01
 
 ```bash
 iperf -s
 ```
 
----
-
-# iperf Client
-
-Run on us-test-02:
+## On us-test-02
 
 ```bash
-iperf -c us-test-01.ZONE
-```
-
-Example:
-
-```bash
-iperf -c us-test-01.us-central1-a
+iperf -c us-test-01.us-east1-c
 ```
 
 ---
 
-# Parallel iperf Streams
+# UDP iperf Test
 
-```bash
-iperf -c us-test-01.ZONE -P 20
-```
-
----
-
-# UDP Bandwidth Test
-
-Server:
+## On us-test-02
 
 ```bash
 iperf -s -u
 ```
 
-Client:
+## On us-test-01
 
 ```bash
-iperf -c us-test-01.ZONE -u -b 2G
+iperf -c us-test-02.us-east4-c -u -b 2G
+```
+
+---
+
+# Parallel TCP Streams Test
+
+## On us-test-01
+
+```bash
+iperf -s
+```
+
+## On us-test-02
+
+```bash
+iperf -c us-test-01.us-east1-c -P 20
 ```
 
 ---
@@ -200,7 +186,7 @@ hostName.[ZONE].c.[PROJECT_ID].internal
 Example:
 
 ```text
-us-test-02.us-central1-a.c.my-project.internal
+us-test-02.us-east4-c.c.my-project.internal
 ```
 
 ---
@@ -213,6 +199,7 @@ us-test-02.us-central1-a.c.my-project.internal
 - VPC network must already exist before running this lab
 - Latency depends on geographical distance between regions
 - Internal DNS is automatically configured by Compute Engine
+- UDP tests can consume significant bandwidth
 
 ---
 
@@ -224,4 +211,6 @@ After completing the lab, you should be able to:
 - Measure latency using ping
 - Trace routes using traceroute
 - Test bandwidth using iperf
+- Compare TCP vs UDP throughput
+- Test parallel TCP streams
 - Understand Google Cloud internal networking

@@ -67,23 +67,74 @@ gcloud compute instances create us-test-04 \
     --tags=ssh,http
 
 echo ""
+echo "========================================="
+echo "VM Creation Complete!"
+echo "========================================="
+
+echo ""
 echo "Listing VM Instances..."
 
 gcloud compute instances list
 
 echo ""
 echo "========================================="
-echo "VM Setup Complete!"
+echo "NEXT MANUAL STEPS"
 echo "========================================="
 
 echo ""
-echo "Next Manual Steps:"
-echo "1. SSH into us-test-01"
-echo "2. Ping other VMs"
-echo "3. Install traceroute and iperf"
-echo "4. Run latency/performance tests"
+echo "STEP 1 — SSH into:"
+echo "1. us-test-01"
+echo "2. us-test-02"
+echo "3. us-test-04"
 
 echo ""
-echo "Install tools using:"
+echo "STEP 2 — Install Tools on us-test-02 and us-test-04"
+
+echo ""
+echo "Run:"
 echo "sudo apt-get update"
 echo "sudo apt-get -y install traceroute mtr tcpdump iperf whois host dnsutils siege"
+
+echo ""
+echo "STEP 3 — TCP iperf Test"
+
+echo ""
+echo "On us-test-01:"
+echo "iperf -s"
+
+echo ""
+echo "On us-test-02:"
+echo "iperf -c us-test-01.$ZONE_1"
+
+echo ""
+echo "STEP 4 — Stop server using CTRL+C"
+
+echo ""
+echo "STEP 5 — UDP Performance Test"
+
+echo ""
+echo "On us-test-02:"
+echo "iperf -s -u"
+
+echo ""
+echo "On us-test-01:"
+echo "iperf -c us-test-02.$ZONE_2 -u -b 2G"
+
+echo ""
+echo "STEP 6 — Stop UDP server using CTRL+C"
+
+echo ""
+echo "STEP 7 — Parallel TCP Streams Test"
+
+echo ""
+echo "On us-test-01:"
+echo "iperf -s"
+
+echo ""
+echo "On us-test-02:"
+echo "iperf -c us-test-01.$ZONE_1 -P 20"
+
+echo ""
+echo "========================================="
+echo "Lab Setup Completed!"
+echo "========================================="
