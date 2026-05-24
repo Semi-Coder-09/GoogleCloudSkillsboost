@@ -1,134 +1,202 @@
 #!/bin/bash
 
-# ============================================
+# =========================================================
 # Google App Engine Deployment Lab
-# ============================================
+# =========================================================
 
-set -e
+# -------------------------------
+# Color Variables
+# -------------------------------
 
-echo "======================================="
-echo "Google App Engine Deployment"
-echo "======================================="
+PURPLE=$'\033[0;35m'
+GOLD=$'\033[1;33m'
+CYAN=$'\033[0;36m'
+GREEN=$'\033[1;32m'
+RED=$'\033[1;31m'
+BLUE=$'\033[1;34m'
+NC=$'\033[0m'
 
-# --------------------------------------------
+BOLD=$(tput bold)
+RESET=$(tput sgr0)
+
+# -------------------------------
+# Banner
+# -------------------------------
+
+clear
+
+echo "${PURPLE}${BOLD}====================================================${RESET}"
+echo "${PURPLE}${BOLD}     Google App Engine Deployment Automation        ${RESET}"
+echo "${PURPLE}${BOLD}====================================================${RESET}"
+echo
+
+# -------------------------------
 # User Inputs
-# --------------------------------------------
+# -------------------------------
 
-read -p "Enter App Engine Region (example: us-central): " REGION
+echo -e "${GOLD}${BOLD}Enter App Engine Region:${RESET} ${NC}"
+read REGION
 
-read -p "Enter new application message: " NEW_MESSAGE
+echo
 
-echo ""
-echo "Region: $REGION"
-echo "Message: $NEW_MESSAGE"
-echo ""
+echo -e "${GOLD}${BOLD}Enter Updated Application Message:${RESET} ${NC}"
+read MESSAGE
 
-# --------------------------------------------
-# TASK 1: Enable API
-# --------------------------------------------
+echo
+echo "${CYAN}${BOLD}Region Selected:${RESET} $REGION"
+echo "${CYAN}${BOLD}Message Selected:${RESET} $MESSAGE"
+echo
 
-echo "======================================="
-echo "TASK 1: Enable App Engine Admin API"
-echo "======================================="
+sleep 2
+
+# -------------------------------
+# Enable API
+# -------------------------------
+
+echo "${BLUE}${BOLD}========================================${RESET}"
+echo "${BLUE}${BOLD}Enabling App Engine Admin API...${RESET}"
+echo "${BLUE}${BOLD}========================================${RESET}"
 
 gcloud services enable appengine.googleapis.com
 
-# --------------------------------------------
-# TASK 2: Download Repository
-# --------------------------------------------
+echo
+echo "${GREEN}${BOLD}API Enabled Successfully.${RESET}"
+echo
 
-echo "======================================="
-echo "TASK 2: Download Hello World App"
-echo "======================================="
+sleep 3
+
+# -------------------------------
+# Remove Existing Repository
+# -------------------------------
 
 cd ~
 
-# Delete old repo if already exists
 if [ -d "python-docs-samples" ]; then
-    echo "Old repository found. Removing..."
+    echo "${RED}${BOLD}Existing Repository Found. Removing...${RESET}"
     rm -rf python-docs-samples
+    echo "${GREEN}${BOLD}Old Repository Removed.${RESET}"
+    echo
 fi
 
-echo "Cloning repository..."
+sleep 2
 
-git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+# -------------------------------
+# Clone Repository
+# -------------------------------
 
-echo "Repository downloaded successfully."
+echo "${BLUE}${BOLD}========================================${RESET}"
+echo "${BLUE}${BOLD}Downloading Hello World Application...${RESET}"
+echo "${BLUE}${BOLD}========================================${RESET}"
+echo
 
-# --------------------------------------------
-# Navigate to App Engine Sample
-# --------------------------------------------
+git clone --progress https://github.com/GoogleCloudPlatform/python-docs-samples.git
+
+echo
+echo "${GREEN}${BOLD}Repository Downloaded Successfully.${RESET}"
+echo
+
+sleep 2
+
+# -------------------------------
+# Navigate to App Directory
+# -------------------------------
 
 cd ~/python-docs-samples/appengine/standard_python3/hello_world
 
-echo "Current Directory:"
+echo "${CYAN}${BOLD}Current Directory:${RESET}"
 pwd
 
-echo "Files:"
+echo
+echo "${CYAN}${BOLD}Project Files:${RESET}"
 ls
 
-# --------------------------------------------
-# TASK 3: Create App Engine App
-# --------------------------------------------
+echo
+sleep 2
 
-echo "======================================="
-echo "TASK 3: Create App Engine Application"
-echo "======================================="
+# -------------------------------
+# Create App Engine App
+# -------------------------------
+
+echo "${BLUE}${BOLD}========================================${RESET}"
+echo "${BLUE}${BOLD}Creating App Engine Application...${RESET}"
+echo "${BLUE}${BOLD}========================================${RESET}"
 
 gcloud app create --region=$REGION --quiet || true
 
-# --------------------------------------------
-# TASK 4: Deploy Application
-# --------------------------------------------
+echo
+echo "${GREEN}${BOLD}App Engine Application Ready.${RESET}"
+echo
 
-echo "======================================="
-echo "TASK 4: Deploy Application"
-echo "======================================="
+sleep 3
+
+# -------------------------------
+# First Deployment
+# -------------------------------
+
+echo "${BLUE}${BOLD}========================================${RESET}"
+echo "${BLUE}${BOLD}Deploying Application...${RESET}"
+echo "${BLUE}${BOLD}========================================${RESET}"
 
 gcloud app deploy --quiet
 
-# --------------------------------------------
-# Open App
-# --------------------------------------------
+echo
+echo "${GREEN}${BOLD}Application Deployed Successfully.${RESET}"
+echo
 
-echo "======================================="
-echo "Opening Application"
-echo "======================================="
+sleep 3
 
+# -------------------------------
+# Open Application
+# -------------------------------
+
+echo "${CYAN}${BOLD}Opening Application in Browser...${RESET}"
 gcloud app browse
 
-# --------------------------------------------
-# TASK 5: Update Message
-# --------------------------------------------
+echo
+sleep 3
 
-echo "======================================="
-echo "TASK 5: Update Application"
-echo "======================================="
+# -------------------------------
+# Update Application Message
+# -------------------------------
 
-sed -i "s/Hello World!/$NEW_MESSAGE/g" main.py
+echo "${BLUE}${BOLD}========================================${RESET}"
+echo "${BLUE}${BOLD}Updating Application Message...${RESET}"
+echo "${BLUE}${BOLD}========================================${RESET}"
 
-echo "Updated main.py successfully."
+sed -i "s/Hello World!/$MESSAGE/g" main.py
 
-# --------------------------------------------
-# Redeploy
-# --------------------------------------------
+echo
+echo "${GREEN}${BOLD}Message Updated Successfully.${RESET}"
+echo
 
-echo "======================================="
-echo "Redeploy Updated Application"
-echo "======================================="
+sleep 2
+
+# -------------------------------
+# Redeploy Updated App
+# -------------------------------
+
+echo "${BLUE}${BOLD}========================================${RESET}"
+echo "${BLUE}${BOLD}Redeploying Updated Application...${RESET}"
+echo "${BLUE}${BOLD}========================================${RESET}"
 
 gcloud app deploy --quiet
 
-# --------------------------------------------
+echo
+echo "${GREEN}${BOLD}Updated Application Deployed Successfully.${RESET}"
+echo
+
+sleep 3
+
+# -------------------------------
 # Open Updated App
-# --------------------------------------------
+# -------------------------------
 
-echo "======================================="
-echo "Opening Updated Application"
-echo "======================================="
+echo "${CYAN}${BOLD}Opening Updated Application...${RESET}"
 
 gcloud app browse
 
-echo "======================================="
-echo "Application Updated Successfully"
-echo "======================================="
+echo
+echo "${PURPLE}${BOLD}====================================================${RESET}"
+echo "${PURPLE}${BOLD}          LAB COMPLETED SUCCESSFULLY                ${RESET}"
+echo "${PURPLE}${BOLD}====================================================${RESET}"
+echo
