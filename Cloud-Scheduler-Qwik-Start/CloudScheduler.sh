@@ -80,30 +80,35 @@ echo "=================================================="
 echo "Waiting For Scheduler Execution"
 echo "=================================================="
 
-sleep 90
+sleep 180
 
 echo ""
 echo "=================================================="
 echo "Pulling Messages From Subscription"
 echo "=================================================="
 
-gcloud pubsub subscriptions pull $SUBSCRIPTION_NAME \
-    --limit=5 \
-    --auto-ack
+echo ""
+echo "Waiting for Pub/Sub messages..."
+
+for i in {1..5}
+do
+    OUTPUT=$(gcloud pubsub subscriptions pull $SUBSCRIPTION_NAME \
+        --limit=5 \
+        --auto-ack 2>/dev/null)
+
+    if [[ -n "$OUTPUT" ]]; then
+        echo "$OUTPUT"
+        break
+    fi
+
+    echo "No messages yet... retrying in 30 seconds"
+    sleep 30
+done
 
 echo ""
 echo "=================================================="
 echo "Lab Completed Successfully!"
 echo "=================================================="
-
-echo ""
-echo "Question Answer:"
-echo ""
-echo "You can trigger an App Engine app, send a message"
-echo "via Cloud Pub/Sub, or hit an arbitrary HTTP endpoint"
-echo "with Cloud Scheduler."
-echo ""
-echo "Correct Answer: TRUE"
 
 echo ""
 echo "Now click: Check my progress"
