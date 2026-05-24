@@ -1,34 +1,57 @@
 #!/bin/bash
 
-echo "=================================================="
-echo "Machine Learning APIs on Google Cloud Lab"
-echo "=================================================="
+# ==================================================
+# Colors
+# ==================================================
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+RESET='\033[0m'
+
+# ==================================================
+# Header
+# ==================================================
+
+clear
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}     Machine Learning APIs on Google Cloud${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
+echo ""
+
+# ==================================================
+# User Inputs
+# ==================================================
+
+read -p "$(echo -e "${YELLOW}ENTER LANGUAGE (e.g., en, fr, es): ${RESET}")" LANGUAGE
+
+read -p "$(echo -e "${YELLOW}ENTER LOCALE (e.g., en_US, fr_FR): ${RESET}")" LOCALE
+
+read -p "$(echo -e "${YELLOW}ENTER BIGQUERY_ROLE (e.g., roles/bigquery.dataEditor): ${RESET}")" BIGQUERY_ROLE
+
+read -p "$(echo -e "${YELLOW}ENTER CLOUD_STORAGE_ROLE (e.g., roles/storage.admin): ${RESET}")" CLOUD_STORAGE_ROLE
 
 echo ""
-echo "Enter Required Details"
-echo ""
 
-read -p "ENTER LANGUAGE (e.g., en, fr, es): " LANGUAGE
-read -p "ENTER LOCALE (e.g., en_US, fr_FR): " LOCALE
-read -p "ENTER BIGQUERY_ROLE (e.g., roles/bigquery.admin): " BIGQUERY_ROLE
-read -p "ENTER CLOUD_STORAGE_ROLE (e.g., roles/storage.admin): " CLOUD_STORAGE_ROLE
+# ==================================================
+# Summary
+# ==================================================
 
-PROJECT_ID=$(gcloud config get-value project)
-SERVICE_ACCOUNT_NAME="ml-api-service-account"
-SERVICE_ACCOUNT_EMAIL="${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Configuration Summary${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
 
-echo ""
-echo "=================================================="
-echo "Configuration Summary"
-echo "=================================================="
-echo "PROJECT ID           : $PROJECT_ID"
-echo "LANGUAGE             : $LANGUAGE"
-echo "LOCALE               : $LOCALE"
-echo "BIGQUERY ROLE        : $BIGQUERY_ROLE"
-echo "CLOUD STORAGE ROLE   : $CLOUD_STORAGE_ROLE"
-echo "SERVICE ACCOUNT      : $SERVICE_ACCOUNT_EMAIL"
+echo -e "${GREEN}LANGUAGE             : ${WHITE}$LANGUAGE${RESET}"
+echo -e "${GREEN}LOCALE               : ${WHITE}$LOCALE${RESET}"
+echo -e "${GREEN}BIGQUERY ROLE        : ${WHITE}$BIGQUERY_ROLE${RESET}"
+echo -e "${GREEN}CLOUD STORAGE ROLE   : ${WHITE}$CLOUD_STORAGE_ROLE${RESET}"
 
 echo ""
+
 read -p "Proceed with setup? (y/n): " CONFIRM
 
 if [[ $CONFIRM != "y" ]]; then
@@ -36,10 +59,27 @@ if [[ $CONFIRM != "y" ]]; then
     exit 1
 fi
 
+# ==================================================
+# Variables
+# ==================================================
+
+PROJECT_ID=$(gcloud config get-value project)
+
+SERVICE_ACCOUNT="ml-api-sa"
+
+SERVICE_ACCOUNT_EMAIL="$SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com"
+
+KEY_FILE="key.json"
+
 echo ""
-echo "=================================================="
-echo "Enabling Required APIs"
-echo "=================================================="
+
+# ==================================================
+# Enable APIs
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Enabling APIs${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
 
 gcloud services enable vision.googleapis.com
 gcloud services enable translate.googleapis.com
@@ -47,17 +87,27 @@ gcloud services enable bigquery.googleapis.com
 gcloud services enable storage.googleapis.com
 
 echo ""
-echo "=================================================="
-echo "Creating Service Account"
-echo "=================================================="
 
-gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
-    --display-name="ML API Service Account"
+# ==================================================
+# Create Service Account
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Creating Service Account${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
+
+gcloud iam service-accounts create $SERVICE_ACCOUNT \
+    --display-name="Machine Learning API Service Account"
 
 echo ""
-echo "=================================================="
-echo "Assigning IAM Roles"
-echo "=================================================="
+
+# ==================================================
+# Assign IAM Roles
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Assigning IAM Roles${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
     --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
@@ -68,73 +118,111 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
     --role="$CLOUD_STORAGE_ROLE"
 
 echo ""
-echo "=================================================="
-echo "Creating Credential File"
-echo "=================================================="
 
-gcloud iam service-accounts keys create key.json \
+# ==================================================
+# Create Service Account Key
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Creating Credential File${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
+
+gcloud iam service-accounts keys create $KEY_FILE \
     --iam-account=$SERVICE_ACCOUNT_EMAIL
 
-export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/key.json"
+export GOOGLE_APPLICATION_CREDENTIALS=$PWD/$KEY_FILE
 
 echo ""
-echo "Credential File Created:"
-echo "$(pwd)/key.json"
+
+echo -e "${GREEN}Credentials Exported:${RESET}"
+echo "$GOOGLE_APPLICATION_CREDENTIALS"
 
 echo ""
-echo "=================================================="
-echo "Copying Python Script From Bucket"
-echo "=================================================="
 
-gsutil ls
+# ==================================================
+# Find Bucket
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Detecting Cloud Storage Bucket${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
+
+BUCKET_NAME=$(gsutil ls | head -n 1 | sed 's/gs:\/\///' | sed 's/\///')
 
 echo ""
-echo "Locate the bucket containing analyze-images-v2.py"
+
+echo -e "${GREEN}Detected Bucket:${RESET} $BUCKET_NAME"
+
 echo ""
 
-read -p "ENTER BUCKET NAME: " BUCKET_NAME
+# ==================================================
+# Download Python File
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Downloading Python File${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
 
 gsutil cp gs://$BUCKET_NAME/analyze-images-v2.py .
 
 echo ""
-echo "=================================================="
-echo "Installing Python Packages"
-echo "=================================================="
 
-pip install --upgrade google-cloud-vision
-pip install --upgrade google-cloud-translate
-pip install --upgrade google-cloud-bigquery
+# ==================================================
+# Replace TBD Sections Automatically
+# ==================================================
 
-echo ""
-echo "=================================================="
-echo "Next Manual Steps"
-echo "=================================================="
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Configuring Python Script${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
 
-echo ""
-echo "1. Open analyze-images-v2.py"
-echo ""
-echo "nano analyze-images-v2.py"
+sed -i "/# TBD: Create a Vision API image object called image_object/a\\
+        image_object = vision.Image(content=file_content)
+" analyze-images-v2.py
 
-echo ""
-echo "2. Replace all # TBD sections using Vision API and Translation API"
+sed -i "/# TBD: Detect text in the image and save the response data into an object called response/a\\
+        response = vision_client.document_text_detection(image=image_object)
+" analyze-images-v2.py
 
-echo ""
-echo "3. Run the script"
-echo ""
-echo "python3 analyze-images-v2.py"
+sed -i "/# TBD: According to the target language pass the description data to the translation API/a\\
+            translation = translate_client.translate(desc, target_language='$LANGUAGE')
+" analyze-images-v2.py
+
+sed -i "s/# errors = bq_client.insert_rows(table, rows_for_bq)/errors = bq_client.insert_rows(table, rows_for_bq)/" analyze-images-v2.py
 
 echo ""
-echo "4. Uncomment the BigQuery upload line at the end"
+
+# ==================================================
+# Run Python Script
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}Running Python Script${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
+
+python3 analyze-images-v2.py $PROJECT_ID $BUCKET_NAME
 
 echo ""
-echo "5. Run BigQuery query:"
-echo ""
-echo "SELECT language, COUNT(*) as total"
-echo "FROM ml_api_results.translated_text"
-echo "GROUP BY language"
-echo "ORDER BY total DESC;"
+
+# ==================================================
+# Run BigQuery Query
+# ==================================================
+
+echo -e "${CYAN}==================================================${RESET}"
+echo -e "${WHITE}BigQuery Results${RESET}"
+echo -e "${CYAN}==================================================${RESET}"
+
+bq query --use_legacy_sql=false \
+'SELECT locale, COUNT(*) as total
+FROM image_classification_dataset.image_text_detail
+GROUP BY locale
+ORDER BY total DESC'
 
 echo ""
-echo "=================================================="
-echo "Lab Setup Completed!"
-echo "=================================================="
+
+# ==================================================
+# Completion
+# ==================================================
+
+echo -e "${GREEN}==================================================${RESET}"
+echo -e "${WHITE}Lab Completed Successfully!${RESET}"
+echo -e "${GREEN}==================================================${RESET}"
