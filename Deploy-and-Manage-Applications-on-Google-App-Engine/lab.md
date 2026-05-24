@@ -293,6 +293,20 @@ Retry deployment manually:
 gcloud app deploy
 ```
 
+## Re-Deployment 
+
+Retry deployment manually:
+
+```bash
+gcloud app deploy --quiet
+```
+
+then 
+
+```bash
+gcloud app deploy
+```
+
 ---
 
 # Expected Outcome
