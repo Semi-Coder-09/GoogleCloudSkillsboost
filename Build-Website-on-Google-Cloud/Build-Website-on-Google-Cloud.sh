@@ -68,7 +68,7 @@ fi
 
 echo "${BLUE}${BOLD}Cloning Repository...${RESET}"
 
-git clone https://github.com/GoogleCloudPlatform/monolith-to-microservices.git
+git clone https://github.com/googlecodelabs/monolith-to-microservices.git
 
 cd monolith-to-microservices
 
